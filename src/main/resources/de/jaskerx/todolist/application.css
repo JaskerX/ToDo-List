@@ -36,7 +36,45 @@
     -fx-background-color: #323232;
 }
 
+.menuitem_selected {
+    -fx-background-color: #2c2c2c;
+    -fx-padding: 11,0,11,0;
+    -fx-min-width: 0;
+    -fx-max-width: 10000;
+    -fx-font-size: 18;
+    -fx-text-fill: #ffffff;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
 .button {
     -fx-alignment: center;
     -fx-cursor: hand;
+}
+
+.container_task {
+    -fx-border-color: black;
+    -fx-border-radius: 10;
+    -fx-background-color: white;
+    -fx-cursor: hand;
+    -fx-background-radius: 10;
+    -fx-margin: 10,0,0,0;
+    -fx-padding: 5,10,5,10;
+    -fx-pref-height: 50;
+}
+
+.task_name {
+    -fx-font-weight: bold;
+    -fx-font-size: 16;
+    -fx-pref-width: 10000;
+    -fx-max-width: 10000;
+}
+
+.task_date {
+    -fx-text-fill: #1e1e1e;
+    -fx-min-width: 85;
+}
+
+.task_description {
+    -fx-text-fill: #5e5e5e;
 }

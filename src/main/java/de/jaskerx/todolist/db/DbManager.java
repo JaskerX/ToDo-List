@@ -12,6 +12,8 @@ public class DbManager {
             con = DriverManager.getConnection("jdbc:sqlite:todo.db");
 
             executeUpdate("CREATE TABLE IF NOT EXISTS categories ('id' INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT, 'name' TEXT NOT NULL)");
+            //TODO: status/progress?
+            executeUpdate("CREATE TABLE IF NOT EXISTS tasks ('id' INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT, 'name' TEXT NOT NULL, 'description' TEXT, 'category' INTEGER NOT NULL, 'created' TIMESTAMP NOT NULL, 'until' TIMESTAMP, 'favorite' BOOLEAN DEFAULT 0)");
 
         } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException(e);
