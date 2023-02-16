@@ -1,6 +1,8 @@
 package de.jaskerx.todolist;
 
+import de.jaskerx.todolist.db.CategoryLabel;
 import de.jaskerx.todolist.db.DbManager;
+import de.jaskerx.todolist.db.TaskBox;
 import javafx.animation.*;
 import javafx.application.Application;
 import javafx.event.Event;
@@ -67,21 +69,8 @@ public class ToDoListApplication extends Application {
         try (ResultSet rs = DbManager.executeQuery("SELECT id, name FROM categories")) {
             while(rs.next()) {
                 int id = Integer.parseInt(rs.getString("id"));
-                Label newLabel = new Label();
-                newLabel.setText(rs.getString("name"));
-                newLabel.getStyleClass().add("menuitem");
-                newLabel.setOnMouseClicked(event -> {
-                    for(Node n : container.getChildren()) {
-                        if(n.getStyleClass().contains("menuitem_selected")) {
-                            n.getStyleClass().remove("menuitem_selected");
-                            n.getStyleClass().add("menuitem");
-                        }
-                    }
-                    newLabel.getStyleClass().remove("menuitem");
-                    newLabel.getStyleClass().add("menuitem_selected");
-                    loadTasks(id);
-                });
-                container.getChildren().add(newLabel);
+                String name = rs.getString("name");
+                container.getChildren().add(new CategoryLabel(name, id, container));
             }
         } catch(SQLException e) {
             e.printStackTrace();
@@ -98,73 +87,16 @@ public class ToDoListApplication extends Application {
                 try {
                     dateUntil = rs.getTimestamp("until").toLocalDateTime();
                 } catch(SQLException ignore) {}
-                final LocalDateTime dateUntilFinal = dateUntil;
                 LocalDateTime dateCreated = rs.getTimestamp("created").toLocalDateTime();
                 String name = rs.getString("name");
                 String description = rs.getString("description");
                 VBox margin = new VBox();
                 margin.setPrefHeight(10);
-                VBox vbox = new VBox();
-                vbox.getStyleClass().add("container_task");
-                vbox.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                    @Override
-                    public void handle(MouseEvent event) {
-                        if(event.getButton() == MouseButton.PRIMARY) {
-                            Label labelName = (Label) primaryScene.lookup("#task_detail_name");
-                            Label labelDescription = (Label) primaryScene.lookup("#task_detail_description");
-                            Label labelUntil = (Label) primaryScene.lookup("#task_detail_until");
-                            Label labelCreated = (Label) primaryScene.lookup("#task_detail_created");
-                            labelName.setText(name);
-                            labelDescription.setText(description);
-                            labelCreated.setText("Erstellt: " + getFormattedDate(dateCreated));
-                            if (dateUntilFinal != null) {
-                                labelUntil.setText("Bis: " + getFormattedDate(dateUntilFinal));
-                            } else {
-                                labelUntil.setText("");
-                            }
-                            primaryScene.lookup("#container_task_detail").setVisible(true);
-                        }
-                    }
-                });
-                Label labelDescription = new Label();
-                labelDescription.getStyleClass().add("task_description");
-                labelDescription.setText(description == null ? "" : description);
-                HBox hBox = new HBox();
-                Label labelName = new Label();
-                Label labelDate = new Label();
-                labelName.getStyleClass().add("task_name");
-                labelDate.getStyleClass().add("task_date");
-                labelName.setText(name);
-                String date = "";
-                if(dateUntil != null) {
-                    date = dateUntil.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.GERMANY).substring(0, 2) + ", ";
-                    date += getFormattedDate(dateUntil);
-                }
-                labelDate.setText(date);
-                hBox.getChildren().addAll(labelName, labelDate);
-                vbox.getChildren().addAll(hBox, labelDescription);
-                containerTasks.getChildren().addAll(margin, vbox);
+                containerTasks.getChildren().addAll(margin, new TaskBox(name, description, dateUntil, dateCreated));
             }
         } catch(SQLException e) {
             e.printStackTrace();
         }
-        /*VBox label = (VBox) primaryScene.lookup("#test");
-        Animation animation = new Transition() {
-            {
-                setCycleDuration(Duration.seconds(3));
-            }
-
-            @Override
-            protected void interpolate(double progress) {
-                double original = 0;
-                if(progress == 0) {
-                    original = label.getWidth();
-                }
-                double newValue = 50 + 50 * progress;
-                label.setPrefHeight(newValue);
-            }
-        };
-        animation.playFromStart();*/
     }
 
     public static String getFormattedDate(LocalDateTime dateTime) {
